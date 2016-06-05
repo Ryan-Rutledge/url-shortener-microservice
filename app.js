@@ -6,10 +6,12 @@ var db = {};
 var sql = new sqlite3.Database(':memory:');
 
 sql.serialize(function() {
-    sql.run('CREATE TABLE sites(id INTEGER PRIMARY KEY, url TEXT UNIQUE NOT NULL)');
+    sql.run('CREATE TABLE sites(id INTEGER PRIMARY KEY, url TEXT UNIQUE NOT NULL, updated INTEGER)');
     db._id = sql.prepare('SELECT id FROM sites WHERE url = ?');
     db._url = sql.prepare('SELECT url FROM sites WHERE id = ?');
-    db._new = sql.prepare('INSERT INTO sites(url) VALUES(?)');
+    db._up = sql.prepare('UPDATE sites SET updated=? WHERE id = ?');
+    db._new = sql.prepare('INSERT INTO sites(url, updated) VALUES(?, ?)');
+    db._trim = sql.prepare('DELETE FROM sites WHERE id not in (SELECT id FROM sites ORDER BY updated DESC LIMIT 50)');
 });
 
 db.rurl = /^https?:\/\/\S+\..+$/;
@@ -22,6 +24,9 @@ db.err  = function(key, cb) {
         }
         else {
             cb(row && row[key]);
+            if (row && row.id) {
+                db._up.run(new Date().getTime(), row.id);
+            }
         }
     };
 };
@@ -31,8 +36,9 @@ db.id = function(url, cb) {
         // If URL doesn't exist
         if (!id) {
             // Create URL
-            db._new.get(url, db.err('id', function() {
+            db._new.run(url, new Date().getTime(), db.err('id', function() {
                 db.id(url, cb);
+                db._trim.run(); // Limit the database size
             }));
         }
         else {
@@ -78,7 +84,6 @@ app.get('/:url*', function(req, res) {
 app.get('/', function(req, res) {
     res.send('main');
 });
-
 
 app.listen(process.env.PORT, function() {
     console.log('Listening on port', process.env.PORT);
