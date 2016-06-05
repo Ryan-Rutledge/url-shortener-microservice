@@ -1,7 +1,6 @@
 var app = require('express')();
 var sqlite3 = require('sqlite3');
 
-// Prepare database
 var db = {};
 var sql = new sqlite3.Database(':memory:');
 
@@ -14,7 +13,7 @@ sql.serialize(function() {
     db._trim = sql.prepare('DELETE FROM sites WHERE id not in (SELECT id FROM sites ORDER BY updated DESC LIMIT 50)');
 });
 
-db.rurl = /^https?:\/\/\S+\..+$/;
+db.rurl = /^https?:\/\/[\w-\.]+\.\w+$/;
 db.err  = function(key, cb) {
     cb = cb || function() {};
     return function(err, row) {
@@ -82,7 +81,7 @@ app.get('/:url*', function(req, res) {
 
 // Homepage
 app.get('/', function(req, res) {
-    res.send('main');
+    res.send('URL Shortener Microservice');
 });
 
 app.listen(process.env.PORT, function() {
