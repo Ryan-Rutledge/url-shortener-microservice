@@ -70,7 +70,7 @@ app.get('/:url*', function(req, res) {
         db.id(url, function(id) {
             res.json({
                 original_url: url,
-                short_url: ['https://', req.get('host'), id].join('/')
+                short_url: ['https:/', req.get('host'), id].join('/')
             });
         });
     }
