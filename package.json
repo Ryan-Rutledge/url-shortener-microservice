@@ -1,0 +1,24 @@
+{
+  "name": "url-shortener-microservice",
+  "version": "1.0.0",
+  "description": "FreeCodeCamp API Project #3",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ryan-Rutledge/url-shortener-microservice.git"
+  },
+  "author": "Ryan Rutledge",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ryan-Rutledge/url-shortener-microservice/issues"
+  },
+  "homepage": "https://github.com/Ryan-Rutledge/url-shortener-microservice#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "sqlite3": "^3.1.4"
+  }
+}
